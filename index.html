@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Er det øltid?</title>
+  <style>
+    html, body {
+      height: 100%;
+      margin: 0;
+    }
+    body {
+      background: #000;
+      color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.5rem;
+      text-align: center;
+    }
+    h1 {
+      font-size: clamp(2rem, 8vw, 4rem);
+      margin: 0;
+    }
+    #svar {
+      font-size: clamp(3rem, 12vw, 6rem);
+      font-weight: bold;
+      margin: 0;
+    }
+    .ja {
+      color: #00c853;
+    }
+    .nej {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Er det øltid?</h1>
+  <p id="svar"></p>
+  <script>
+    function opdater() {
+      // Dansk tid uanset hvor besøgende er
+      const now = new Date();
+      const parts = new Intl.DateTimeFormat("da-DK", {
+        timeZone: "Europe/Copenhagen",
+        weekday: "short",
+        hour: "numeric",
+        hour12: false,
+      }).formatToParts(now);
+
+      const weekday = parts.find(p => p.type === "weekday").value;
+      const hour = parseInt(parts.find(p => p.type === "hour").value, 10);
+
+      const erOeltid = weekday.startsWith("fre") && hour >= 14;
+
+      const svar = document.getElementById("svar");
+      svar.textContent = erOeltid ? "Ja" : "Nej";
+      svar.className = erOeltid ? "ja" : "nej";
+    }
+
+    opdater();
+    setInterval(opdater, 60 * 1000);
+  </script>
+</body>
+</html>
