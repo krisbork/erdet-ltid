@@ -42,6 +42,8 @@
   <p id="svar"></p>
   <script>
     function opdater() {
+      const tvingJa = new URLSearchParams(window.location.search).has("ja");
+
       // Dansk tid uanset hvor besøgende er
       const now = new Date();
       const parts = new Intl.DateTimeFormat("da-DK", {
@@ -54,7 +56,7 @@
       const weekday = parts.find(p => p.type === "weekday").value;
       const hour = parseInt(parts.find(p => p.type === "hour").value, 10);
 
-      const erOeltid = weekday.startsWith("fre") && hour >= 14;
+      const erOeltid = tvingJa || (weekday.startsWith("fre") && hour >= 14);
 
       const svar = document.getElementById("svar");
       svar.textContent = erOeltid ? "Ja" : "Nej";
