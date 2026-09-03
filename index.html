@@ -42,21 +42,32 @@
   <p id="svar"></p>
   <script>
     function opdater() {
-      const tvingJa = new URLSearchParams(window.location.search).has("ja");
+      const parametre = new URLSearchParams(window.location.search);
+      const jaVaerdi = parametre.get("ja");
+      const planlagtJa = /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])T([01]\d|2[0-3]):[0-5]\d$/.test(jaVaerdi || "");
 
       // Dansk tid uanset hvor besøgende er
       const now = new Date();
       const parts = new Intl.DateTimeFormat("da-DK", {
         timeZone: "Europe/Copenhagen",
         weekday: "short",
-        hour: "numeric",
-        hour12: false,
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        hourCycle: "h23",
       }).formatToParts(now);
 
       const weekday = parts.find(p => p.type === "weekday").value;
       const hour = parseInt(parts.find(p => p.type === "hour").value, 10);
+      const part = type => parts.find(p => p.type === type).value;
+      const danskDatoTid = `${part("year")}-${part("month")}-${part("day")}T${part("hour")}:${part("minute")}`;
 
-      const erOeltid = tvingJa || (weekday.startsWith("fre") && hour >= 14);
+      const almindeligOeltid = weekday.startsWith("fre") && hour >= 14;
+      const erOeltid = planlagtJa
+        ? danskDatoTid >= jaVaerdi
+        : parametre.has("ja") || almindeligOeltid;
 
       const svar = document.getElementById("svar");
       svar.textContent = erOeltid ? "Ja" : "Nej";
@@ -64,7 +75,7 @@
     }
 
     opdater();
-    setInterval(opdater, 60 * 1000);
+    setInterval(opdater, 1000);
   </script>
 </body>
 </html>
